@@ -2,6 +2,7 @@ package org.example.javawebbigjob.entity;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
+import java.util.List;
 
 @Data
 public class Category {
@@ -10,6 +11,8 @@ public class Category {
     
     @JsonProperty("parent_id")
     private Long parentId;
+    
+    private List<Category> children;
     
     private String description;
     
@@ -76,5 +79,13 @@ public class Category {
 
     public void setStatus(Integer status) {
         this.status = status;
+    }
+
+    public List<Category> getChildren() {
+        return children;
+    }
+
+    public void setChildren(List<Category> children) {
+        this.children = children;
     }
 }

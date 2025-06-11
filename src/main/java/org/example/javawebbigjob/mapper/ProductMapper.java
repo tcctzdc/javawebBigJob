@@ -57,5 +57,37 @@ public interface ProductMapper {
 
     @Select("SELECT * FROM product WHERE category_id = #{categoryId}")
     List<Product> findByCategoryId(@Param("categoryId") Long categoryId);
+
+    @Select({
+        "<script>",
+        "SELECT * FROM product",
+        "WHERE 1=1",
+        "<if test='parentCategory != null and parentCategory != \"\"'>",
+        "AND parent_category LIKE CONCAT('%', #{parentCategory}, '%')",
+        "</if>",
+        "<if test='childCategory != null and childCategory != \"\"'>",
+        "AND child_category LIKE CONCAT('%', #{childCategory}, '%')",
+        "</if>",
+        "<if test='name != null and name != \"\"'>",
+        "AND name LIKE CONCAT('%', #{name}, '%')",
+        "</if>",
+        "</script>"
+    })
+    @Results({
+        @Result(property = "id", column = "id"),
+        @Result(property = "name", column = "name"),
+        @Result(property = "price", column = "price"),
+        @Result(property = "stock", column = "stock"),
+        @Result(property = "parentCategory", column = "parent_category"),
+        @Result(property = "childCategory", column = "child_category")
+    })
+    List<Product> search(
+        @Param("name") String name,
+        @Param("parentCategoryId") Long parentCategoryId,
+        @Param("childCategoryId") Long childCategoryId
+    );
+
+    @Update("UPDATE product SET stock = #{stock} WHERE id = #{id}")
+    void updateStock(@Param("id") Long id, @Param("stock") int stock);
 }
 

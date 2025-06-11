@@ -1,6 +1,6 @@
 package org.example.javawebbigjob.service;
 
-import org.example.javawebbigjob.entity.Product;
+
 import org.example.javawebbigjob.entity.User;
 import org.example.javawebbigjob.mapper.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +23,9 @@ public class UserService {
     }
 
     public void add(User user) {
+        // Set create_time to current time
+        user.setCreateTime(new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+                .format(new java.util.Date()));
         userMapper.insert(user);
     }
 
@@ -38,13 +41,19 @@ public class UserService {
         userMapper.deleteBatch(ids);
     }
 
-
-    public List<User> findByPage(int offset, int size){
+    public List<User> findByPage(int offset, int size) {
         return userMapper.findByPage(offset, size);
     }
 
-    public int countAll(){
+    public int countAll() {
         return userMapper.countAll();
+    }
+
+    public List<User> searchUsers(String username, String id) {
+        if (username == null && id == null) {
+            return userMapper.findAll();
+        }
+        return userMapper.search(username, id);
     }
 
 }

@@ -7,6 +7,13 @@ import java.util.List;
 
 @Mapper
 public interface CategoryMapper {
+    @Select("SELECT * FROM category LIMIT #{size} OFFSET #{offset}")
+    List<Category> findByPage(@Param("offset") int offset, @Param("size") int size);
+
+    @Select("SELECT COUNT(*) FROM category")
+    int countAll();
+
+
     // 查询所有父分类（parent_id 为 null 或 0）
     @Select("SELECT id, name, parent_id, description, sort_order, status " +
             "FROM category WHERE (parent_id IS NULL OR parent_id = 0) ORDER BY status DESC, sort_order")
@@ -94,4 +101,32 @@ public interface CategoryMapper {
     // 获取指定父分类下最大的排序值
     @Select("SELECT COALESCE(MAX(sort_order), 0) FROM category WHERE parent_id = #{parentId}")
     Integer getMaxSortOrderByParentId(@Param("parentId") Long parentId);
+
+    // 获取所有已使用的ID
+    @Select("SELECT id FROM category ORDER BY id")
+    List<Long> getAllIds();
+
+    // 获取当前最大ID
+    @Select("SELECT COALESCE(MAX(id), 0) FROM category")
+    Long getMaxId();
+
+    // 重置自增值
+    @Update("ALTER TABLE category AUTO_INCREMENT = 1")
+    void resetAutoIncrement();
+
+    @Select("SELECT * FROM category")
+    @Results({
+        @Result(property = "id", column = "id"),
+        @Result(property = "name", column = "name"),
+        @Result(property = "parentId", column = "parent_id")
+    })
+    List<Category> findAll();
+
+    @Select("SELECT * FROM category WHERE name = #{name}")
+    @Results({
+        @Result(property = "id", column = "id"),
+        @Result(property = "name", column = "name"),
+        @Result(property = "parentId", column = "parent_id")
+    })
+    Category findByName(@Param("name") String name);
 }

@@ -1,26 +1,39 @@
 package org.example.javawebbigjob.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 @Data
 public class Delivery {
     private Long id;
+    
+    @JsonProperty("orderId")
     private Long orderId;
+    
+    @JsonProperty("courierName")
+    private String courierName;
+    
     private String company;
-    private String trackingNumber;
+    
+    @JsonProperty("trackingNo")
+    private String trackingNo;
+    
     private String status;
-    private String deliveryMan;
-
-    public Delivery(Long id, Long orderId, String company, String trackingNumber, String status, String deliveryMan) {
-        this.id = id;
-        this.orderId = orderId;
-        this.company = company;
-        this.trackingNumber = trackingNumber;
-        this.status = status;
-        this.deliveryMan = deliveryMan;
-    }
+    
+    @JsonProperty("updateTime")
+    private String updateTime;
 
     public Delivery() {
+    }
+
+    public Delivery(Long id, Long orderId, String courierName, String company, String trackingNo, String status, String updateTime) {
+        this.id = id;
+        this.orderId = orderId;
+        this.courierName = courierName;
+        this.company = company;
+        this.trackingNo = trackingNo;
+        this.status = status;
+        this.updateTime = updateTime;
     }
 
     public Long getId() {
@@ -39,6 +52,14 @@ public class Delivery {
         this.orderId = orderId;
     }
 
+    public String getCourierName() {
+        return courierName;
+    }
+
+    public void setCourierName(String courierName) {
+        this.courierName = courierName;
+    }
+
     public String getCompany() {
         return company;
     }
@@ -47,12 +68,12 @@ public class Delivery {
         this.company = company;
     }
 
-    public String getTrackingNumber() {
-        return trackingNumber;
+    public String getTrackingNo() {
+        return trackingNo;
     }
 
-    public void setTrackingNumber(String trackingNumber) {
-        this.trackingNumber = trackingNumber;
+    public void setTrackingNo(String trackingNo) {
+        this.trackingNo = trackingNo;
     }
 
     public String getStatus() {
@@ -63,11 +84,11 @@ public class Delivery {
         this.status = status;
     }
 
-    public String getDeliveryMan() {
-        return deliveryMan;
+    public String getUpdateTime() {
+        return updateTime;
     }
 
-    public void setDeliveryMan(String deliveryMan) {
-        this.deliveryMan = deliveryMan;
+    public void setUpdateTime(String updateTime) {
+        this.updateTime = updateTime;
     }
 }

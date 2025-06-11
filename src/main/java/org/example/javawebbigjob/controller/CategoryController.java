@@ -8,15 +8,34 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/categories")
+@CrossOrigin
 public class CategoryController {
     private static final Logger logger = LoggerFactory.getLogger(CategoryController.class);
 
     @Autowired
     private CategoryService categoryService;
+
+    @GetMapping
+    public ResponseEntity<Map<String, Object>> list(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "6") int size){
+        int offset = (page - 1)/size;
+        List<Category> categories = categoryService.findByPage(offset, size);
+        int total = categoryService.countAll();
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("categories", categories);
+        response.put("total", total);
+        response.put("currentPage", page);
+        response.put("pageSize", size);
+        return ResponseEntity.ok(response);
+    }
 
     // 获取所有启用的父分类
     @GetMapping("/parents")
@@ -144,6 +163,19 @@ public class CategoryController {
         } catch (Exception e) {
             logger.error("Error updating category sort order", e);
             return ResponseEntity.status(500).body("排序更新失败: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/tree")
+    public ResponseEntity<List<Category>> getCategoryTree() {
+        try {
+            logger.info("Fetching category tree");
+            List<Category> categories = categoryService.getCategoryTree();
+            logger.info("Found {} categories in tree", categories.size());
+            return ResponseEntity.ok(categories);
+        } catch (Exception e) {
+            logger.error("Error fetching category tree: {}", e.getMessage(), e);
+            return ResponseEntity.internalServerError().build();
         }
     }
 }

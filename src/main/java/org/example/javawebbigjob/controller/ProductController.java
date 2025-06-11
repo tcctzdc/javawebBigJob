@@ -3,6 +3,8 @@ package org.example.javawebbigjob.controller;
 import org.apache.ibatis.annotations.Update;
 import org.example.javawebbigjob.entity.Product;
 import org.example.javawebbigjob.service.ProductService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
@@ -14,7 +16,10 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/products")
+@CrossOrigin
 public class ProductController {
+    private static final Logger logger = LoggerFactory.getLogger(ProductController.class);
+
     @Autowired
     private ProductService productService;
 
@@ -91,6 +96,40 @@ public class ProductController {
             return ResponseEntity.ok("状态更新成功");
         } catch (Exception e) {
             return ResponseEntity.status(500).body("状态更新失败: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<Product>> searchProducts(
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String parentCategory,
+            @RequestParam(required = false) String childCategory) {
+        try {
+            logger.info("Searching products with name: {}, parentCategory: {}, childCategory: {}", 
+                name, parentCategory, childCategory);
+            List<Product> products = productService.searchProducts(name, parentCategory, childCategory);
+            logger.info("Found {} products", products.size());
+            return ResponseEntity.ok(products);
+        } catch (Exception e) {
+            logger.error("Error searching products", e);
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @PutMapping("/{id}/stock")
+    public ResponseEntity<Void> updateStock(
+            @PathVariable Long id,
+            @RequestBody Map<String, Integer> request) {
+        try {
+            Integer quantity = request.get("quantity");
+            if (quantity == null) {
+                return ResponseEntity.badRequest().build();
+            }
+            productService.updateStock(id, quantity);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            logger.error("Error updating product stock", e);
+            return ResponseEntity.internalServerError().build();
         }
     }
 }

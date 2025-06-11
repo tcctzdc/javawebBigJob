@@ -1,4 +1,3 @@
-
 package org.example.javawebbigjob.entity;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -8,13 +7,33 @@ import lombok.Data;
 public class User {
     private Long id;
     private String username;
-    private String phone;
     private String password;
-    private String address;
+    
     @JsonProperty("real_name")
     private String realName;
+    
+    private String phone;
+    private String address;
+    
     @JsonProperty("create_time")
     private String createTime;
+
+    public User() {
+        this.username = "";
+        this.password = "";
+        this.realName = "";
+        this.phone = "";
+        this.address = "";
+    }
+
+    public User(Long id, String username, String realName, String phone, String address) {
+        this.id = id;
+        this.username = username != null ? username : "";
+        this.password = "";
+        this.realName = realName != null ? realName : "";
+        this.phone = phone != null ? phone : "";
+        this.address = address != null ? address : "";
+    }
 
     public Long getId() {
         return id;
@@ -25,43 +44,43 @@ public class User {
     }
 
     public String getUsername() {
-        return username;
+        return username != null ? username : "";
     }
 
     public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
+        this.username = username != null ? username : "";
     }
 
     public String getPassword() {
-        return password;
+        return password != null ? password : "";
     }
 
     public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
+        this.password = password != null ? password : "";
     }
 
     public String getRealName() {
-        return realName;
+        return realName != null ? realName : "";
     }
 
     public void setRealName(String realName) {
-        this.realName = realName;
+        this.realName = realName != null ? realName : "";
+    }
+
+    public String getPhone() {
+        return phone != null ? phone : "";
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone != null ? phone : "";
+    }
+
+    public String getAddress() {
+        return address != null ? address : "";
+    }
+
+    public void setAddress(String address) {
+        this.address = address != null ? address : "";
     }
 
     public String getCreateTime() {
@@ -70,18 +89,5 @@ public class User {
 
     public void setCreateTime(String createTime) {
         this.createTime = createTime;
-    }
-
-    public User(Long id, String username, String phone, String password, String address, String realName, String createTime) {
-        this.id = id;
-        this.username = username;
-        this.phone = phone;
-        this.password = password;
-        this.address = address;
-        this.realName = realName;
-        this.createTime = createTime;
-    }
-
-    public User() {
     }
 }

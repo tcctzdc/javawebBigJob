@@ -5,13 +5,22 @@ import org.example.javawebbigjob.entity.Product;
 import org.example.javawebbigjob.mapper.CategoryMapper;
 import org.example.javawebbigjob.mapper.ProductMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.HashMap;
+import java.util.ArrayList;
 
 @Service
 public class CategoryService {
+    private static final Logger logger = LoggerFactory.getLogger(CategoryService.class);
+
     @Autowired
     private CategoryMapper categoryMapper;
 
@@ -56,6 +65,21 @@ public class CategoryService {
                 category.setSortOrder(maxSortOrder + 1);
             }
         }
+        
+        // 获取所有已使用的ID
+        List<Long> usedIds = categoryMapper.getAllIds();
+        
+        // 找到第一个可用的ID
+        Long nextId = 1L;
+        for (Long id : usedIds) {
+            if (id > nextId) {
+                break;
+            }
+            nextId = id + 1;
+        }
+        
+        // 设置新分类的ID
+        category.setId(nextId);
         
         categoryMapper.insert(category);
     }
@@ -127,5 +151,54 @@ public class CategoryService {
         category.setId(id);
         category.setSortOrder(sortOrder);
         categoryMapper.update(category);
+    }
+
+    public List<Category> findByPage(int offset, int size){return categoryMapper.findByPage(offset, size);}
+
+    public int countAll(){return categoryMapper.countAll();}
+
+    public List<Category> listAll() {
+        return categoryMapper.findAll();
+    }
+
+    public List<Category> getCategoryTree() {
+        try {
+            // 获取所有分类
+            List<Category> allCategories = categoryMapper.findAll();
+            logger.info("Found {} categories", allCategories.size());
+
+            // 创建分类ID到分类对象的映射
+            Map<Long, Category> categoryMap = new HashMap<>();
+            List<Category> rootCategories = new ArrayList<>();
+
+            // 将所有分类放入Map
+            for (Category category : allCategories) {
+                categoryMap.put(category.getId(), category);
+                // 如果是根分类（parent_id 为 null 或 0），添加到根分类列表
+                if (category.getParentId() == null || category.getParentId() == 0) {
+                    rootCategories.add(category);
+                }
+            }
+
+            // 构建树形结构
+            for (Category category : allCategories) {
+                // 如果不是根分类，将其添加到父分类的children列表中
+                if (category.getParentId() != null && category.getParentId() > 0) {
+                    Category parent = categoryMap.get(category.getParentId());
+                    if (parent != null) {
+                        if (parent.getChildren() == null) {
+                            parent.setChildren(new ArrayList<>());
+                        }
+                        parent.getChildren().add(category);
+                    }
+                }
+            }
+
+            logger.info("Built category tree with {} root categories", rootCategories.size());
+            return rootCategories;
+        } catch (Exception e) {
+            logger.error("Error building category tree: {}", e.getMessage(), e);
+            throw new RuntimeException("Failed to build category tree", e);
+        }
     }
 }
