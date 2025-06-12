@@ -8,16 +8,16 @@ import java.util.List;
 @Mapper
 public interface ProductMapper {
 
-    @Select("SELECT * FROM product")
+    @Select("SELECT * FROM product WHERE status = 1")
     List<Product> findAll();
 
-    @Select("SELECT * FROM product LIMIT #{size} OFFSET #{offset}")
+    @Select("SELECT * FROM product WHERE status = 1 LIMIT #{size} OFFSET #{offset}")
     List<Product> findByPage(@Param("offset") int offset, @Param("size") int size);
 
     @Select("SELECT * FROM product WHERE id = #{id}")
     Product findById(@Param("id") Long id);
 
-    @Select("SELECT COUNT(*) FROM product")
+    @Select("SELECT COUNT(*) FROM product WHERE status = 1")
     int countAll();
 
     @Insert("INSERT INTO product (name, category_id, description, price, stock, image_url, status, create_time) " +
@@ -55,13 +55,13 @@ public interface ProductMapper {
     })
     void deleteBatch(@Param("ids") List<Long> ids);
 
-    @Select("SELECT * FROM product WHERE category_id = #{categoryId}")
+    @Select("SELECT * FROM product WHERE category_id = #{categoryId} AND status = 1")
     List<Product> findByCategoryId(@Param("categoryId") Long categoryId);
 
     @Select({
         "<script>",
         "SELECT * FROM product",
-        "WHERE 1=1",
+        "WHERE status = 1",
         "<if test='parentCategory != null and parentCategory != \"\"'>",
         "AND parent_category LIKE CONCAT('%', #{parentCategory}, '%')",
         "</if>",
